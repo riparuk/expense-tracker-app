@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expense Tracker App
 
-## Getting Started
+Aplikasi pelacak pengeluaran berbasis Next.js dengan Prisma (PostgreSQL).
 
-First, run the development server:
+## Prasyarat
+- Node.js 18+ (disarankan LTS)
+- PostgreSQL yang berjalan dan dapat diakses
+- npm (atau yarn/pnpm)
 
+## Setup Cepat
+1. Salin env contoh menjadi file `.env`.
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` dan isi variabel berikut:
+   - `DATABASE_URL` → connection string PostgreSQL (contoh: `postgresql://user:password@localhost:5432/expense_tracker?schema=public`)
+   - `JWT_SECRET` → rahasia untuk signing token
+
+3. Instal dependensi.
+   ```bash
+   npm install
+   ```
+
+4. Generate Prisma Client.
+   ```bash
+   npx prisma generate
+   ```
+
+5. Sinkronkan schema ke database (membuat tabel).
+   ```bash
+   npx prisma db push
+   ```
+
+## Menjalankan Aplikasi (Development)
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Aplikasi akan berjalan di `http://localhost:3000`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Skrip yang Tersedia
+- `npm run dev` → Menjalankan Next.js dev server
+- `npm run build` → Build untuk production
+- `npm run start` → Menjalankan hasil build
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Prisma
+- File schema: `prisma/schema.prisma`
+- Generator client output: `app/generated/prisma`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Perintah umum:
+- Generate client: `npx prisma generate`
+- Push schema ke DB: `npx prisma db push`
+- Buka Prisma Studio: `npx prisma studio`
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Troubleshooting
+- Error koneksi DB: pastikan `DATABASE_URL` benar dan database dapat diakses.
+- Error saat `db seed`: pastikan `ts-node` terpasang, atau ubah script seed untuk menggunakan `tsx` bila diperlukan.
+- Perubahan schema tidak terlihat: jalankan ulang `npx prisma generate` setelah mengubah `schema.prisma`.

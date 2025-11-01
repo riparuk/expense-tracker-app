@@ -1,5 +1,5 @@
 // app/api/expenses/[id]/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { getAuthUserId } from '@/app/lib/auth';
 
@@ -7,17 +7,19 @@ const prisma = new PrismaClient();
 
 // GET /api/expenses/[id] - Get a single expense
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const userId = getAuthUserId(request as any);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await context.params;
+
   try {
     const expense = await prisma.expense.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: { category: true },
     });
 
@@ -45,20 +47,22 @@ export async function GET(
 
 // PUT /api/expenses/[id] - Update an expense
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const userId = getAuthUserId(request as any);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await context.params;
+
   try {
     const { title, amount, categoryId, date, description } = await request.json();
 
     // Check if expense exists and belongs to user
     const existingExpense = await prisma.expense.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!existingExpense) {
@@ -88,7 +92,7 @@ export async function PUT(
 
     // Update the expense
     const updatedExpense = await prisma.expense.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         ...(title && { title }),
         ...(amount !== undefined && { amount: parseFloat(amount) }),
@@ -111,18 +115,20 @@ export async function PUT(
 
 // DELETE /api/expenses/[id] - Delete an expense
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const userId = getAuthUserId(request as any);
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { id } = await context.params;
+
   try {
     // Check if expense exists and belongs to user
     const expense = await prisma.expense.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     if (!expense) {
@@ -138,7 +144,7 @@ export async function DELETE(
 
     // Delete the expense
     await prisma.expense.delete({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json({ message: 'Expense deleted successfully' });
