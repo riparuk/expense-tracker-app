@@ -7,6 +7,7 @@
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -23,9 +24,19 @@ model User {
 }
 
 model Expense {
-  id        Int     @id @default(autoincrement())
-  title     String
-  amount   String?
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
+  id          Int       @id @default(autoincrement())
+  title       String
+  amount      Float
+  date        DateTime  @default(now())
+  description String?
+  authorId    Int
+  categoryId  Int
+  author      User      @relation(fields: [authorId], references: [id])
+  category    Category  @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  expenses  Expense[]
 }
